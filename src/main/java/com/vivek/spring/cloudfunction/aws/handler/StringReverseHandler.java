@@ -1,4 +1,4 @@
-package com.vivek.spring.cloudfunction.aws;
+package com.vivek.spring.cloudfunction.aws.handler;
 
 import org.springframework.cloud.function.adapter.aws.SpringBootRequestHandler;
 
