@@ -8,6 +8,10 @@ import org.springframework.stereotype.Component;
 
 import java.util.function.Function;
 
+
+/**
+ * This service would convert the input String to Upper case and Return it back
+ */
 @Component("uppercaseFunction")
 public class UppercaseFunction implements Function<UppercaseRequest, UppercaseResponse> {
 
@@ -17,8 +21,7 @@ public class UppercaseFunction implements Function<UppercaseRequest, UppercaseRe
         this.uppercaseService = uppercaseService;
     }
 
-    @Override
-    public UppercaseResponse apply(final UppercaseRequest uppercaseRequest) {
+    @Override public UppercaseResponse apply(final UppercaseRequest uppercaseRequest) {
         final UppercaseResponse result = new UppercaseResponse();
 
         result.setResult(uppercaseService.uppercase(uppercaseRequest.getInput()));

@@ -1,5 +1,8 @@
 package com.vivek.spring.cloudfunction.aws.domain;
 
+/**
+ * Model of UpperCase response
+ */
 public class UppercaseResponse {
 
     private String result;

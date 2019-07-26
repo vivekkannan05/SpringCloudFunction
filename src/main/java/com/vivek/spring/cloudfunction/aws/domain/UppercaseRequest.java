@@ -1,5 +1,8 @@
 package com.vivek.spring.cloudfunction.aws.domain;
 
+/**
+ * Model for Upper Case Request
+ */
 public class UppercaseRequest {
 
     private String input;

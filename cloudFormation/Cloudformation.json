@@ -1,0 +1,140 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "",
+  "Parameters": {
+    "upperCaseArtifact": {
+      "Type": "String",
+      "Description": "Name of the key for Lambda Code in S3 bucket",
+      "Default": "spring-cloud-functions-0.0.2-SNAPSHOT-aws.jar"
+    },
+    "artifactBucket": {
+      "Type": "String",
+      "Description": "Name of the bucket",
+      "Default": "vk-bucket-s3"
+    }
+  },
+  "Mappings": {},
+  "Conditions": {},
+  "Resources": {
+    "lambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "artifactBucket"
+          },
+          "S3Key": {
+            "Ref": "upperCaseArtifact"
+          }
+        },
+        "Handler": "com.vivek.spring.cloudfunction.aws.handler.UppercaseFunctionHandler",
+        "Role": {
+          "Fn::GetAtt": [
+            "lambdaExecutionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "java8",
+        "FunctionName": "uppercaseFunction",
+        "MemorySize": 512,
+        "Timeout": 100,
+        "KmsKeyArn": "",
+        "Environment": {
+          "Variables": {
+            "FUNCTION_NAME": "uppercaseFunction",
+            "MAIN_CLASS": "com.vivek.spring.cloudfunction.aws.CloudFunctionAwsApplication"
+          }
+        },
+        "Description": "Lambda Function for  UpperCase Service"
+      }
+    },
+    "lambdaExecutionRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              },
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        },
+        "Path": "/",
+        "Policies": [
+          {
+            "PolicyName": "LambdaPolicy",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Sid": "Stmt1564145987807",
+                  "Action": [
+                    "s3:GetObject",
+                    "s3:GetObjectAcl"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": "arn:aws:s3:::vk-bucket-s3"
+                },
+                {
+                  "Sid": "Stmt1564146273674",
+                  "Action": [
+                    "xray:BatchGetTraces",
+                    "xray:GetTraceSummaries",
+                    "xray:PutTelemetryRecords",
+                    "xray:PutTraceSegments"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": "*"
+                },
+                {
+                  "Sid": "Stmt1564146376746",
+                  "Action": [
+                    "kms:Decrypt"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": "*"
+                },
+                {
+                  "Sid": "Stmt1564146560545",
+                  "Action": [
+                    "dynamodb:BatchGetItem",
+                    "dynamodb:BatchWriteItem",
+                    "dynamodb:GetItem",
+                    "dynamodb:Query",
+                    "dynamodb:Scan",
+                    "dynamodb:UpdateItem",
+                    "dynamodb:PutItem"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": "arn:aws:dynamodb:eu-west-1:XXXXXX:table/input_data"
+                },
+                {
+                  "Sid": "Stmt1564148758856",
+                  "Action": "logs:*",
+                  "Effect": "Allow",
+                  "Resource": "*"
+                }
+              ]
+            }
+          }
+        ],
+        "RoleName": "UppeCaseLambdaRole"
+      }
+    }
+  },
+  "Outputs": {
+    "Lambda": {
+      "Value": {
+        "Ref": "lambdaFunction"
+      }
+    }
+  }
+}
