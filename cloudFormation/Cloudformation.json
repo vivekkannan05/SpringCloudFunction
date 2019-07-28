@@ -1,140 +1,388 @@
 {
-  "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "",
-  "Parameters": {
-    "upperCaseArtifact": {
-      "Type": "String",
-      "Description": "Name of the key for Lambda Code in S3 bucket",
-      "Default": "spring-cloud-functions-0.0.2-SNAPSHOT-aws.jar"
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "",
+    "Parameters": {
+        "upperCaseArtifact": {
+            "Type": "String",
+            "Description": "Name of the key for Lambda Code in S3 bucket",
+            "Default": "spring-cloud-functions-0.0.2-SNAPSHOT-aws.jar"
+        },
+        "artifactBucket": {
+            "Type": "String",
+            "Description": "Name of the bucket",
+            "Default": "vk-bucket-s3"
+        }
     },
-    "artifactBucket": {
-      "Type": "String",
-      "Description": "Name of the bucket",
-      "Default": "vk-bucket-s3"
-    }
-  },
-  "Mappings": {},
-  "Conditions": {},
-  "Resources": {
-    "lambdaFunction": {
-      "Type": "AWS::Lambda::Function",
-      "Properties": {
-        "Code": {
-          "S3Bucket": {
-            "Ref": "artifactBucket"
-          },
-          "S3Key": {
-            "Ref": "upperCaseArtifact"
-          }
-        },
-        "Handler": "com.vivek.spring.cloudfunction.aws.handler.UppercaseFunctionHandler",
-        "Role": {
-          "Fn::GetAtt": [
-            "lambdaExecutionRole",
-            "Arn"
-          ]
-        },
-        "Runtime": "java8",
-        "FunctionName": "uppercaseFunction",
-        "MemorySize": 512,
-        "Timeout": 100,
-        "KmsKeyArn": "",
-        "Environment": {
-          "Variables": {
-            "FUNCTION_NAME": "uppercaseFunction",
-            "MAIN_CLASS": "com.vivek.spring.cloudfunction.aws.CloudFunctionAwsApplication"
-          }
-        },
-        "Description": "Lambda Function for  UpperCase Service"
-      }
-    },
-    "lambdaExecutionRole": {
-      "Type": "AWS::IAM::Role",
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
-            {
-              "Effect": "Allow",
-              "Principal": {
-                "Service": [
-                  "lambda.amazonaws.com"
-                ]
-              },
-              "Action": [
-                "sts:AssumeRole"
-              ]
+    "Mappings": {},
+    "Conditions": {},
+    "Resources": {
+        "lambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+                "Code": {
+                    "S3Bucket": {
+                        "Ref": "artifactBucket"
+                    },
+                    "S3Key": {
+                        "Ref": "upperCaseArtifact"
+                    }
+                },
+                "Handler": "com.vivek.spring.cloudfunction.aws.handler.UppercaseFunctionHandler",
+                "Role": {
+                    "Fn::GetAtt": [
+                        "lambdaExecutionRole",
+                        "Arn"
+                    ]
+                },
+                "Runtime": "java8",
+                "FunctionName": "uppercaseFunction",
+                "MemorySize": 512,
+                "Timeout": 100,
+                "KmsKeyArn": "",
+                "Environment": {
+                    "Variables": {
+                        "FUNCTION_NAME": "uppercaseFunction",
+                        "MAIN_CLASS": "com.vivek.spring.cloudfunction.aws.CloudFunctionAwsApplication"
+                    }
+                },
+                "Description": "Lambda Function for  UpperCase Service"
             }
-          ]
         },
-        "Path": "/",
-        "Policies": [
-          {
-            "PolicyName": "LambdaPolicy",
-            "PolicyDocument": {
-              "Version": "2012-10-17",
-              "Statement": [
-                {
-                  "Sid": "Stmt1564145987807",
-                  "Action": [
-                    "s3:GetObject",
-                    "s3:GetObjectAcl"
-                  ],
-                  "Effect": "Allow",
-                  "Resource": "arn:aws:s3:::vk-bucket-s3"
+        "lambdaExecutionRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": [
+                                    "lambda.amazonaws.com"
+                                ]
+                            },
+                            "Action": [
+                                "sts:AssumeRole"
+                            ]
+                        }
+                    ]
                 },
-                {
-                  "Sid": "Stmt1564146273674",
-                  "Action": [
-                    "xray:BatchGetTraces",
-                    "xray:GetTraceSummaries",
-                    "xray:PutTelemetryRecords",
-                    "xray:PutTraceSegments"
-                  ],
-                  "Effect": "Allow",
-                  "Resource": "*"
+                "Path": "/",
+                "Policies": [
+                    {
+                        "PolicyName": "Lambda-XRay-Access-Policy",
+                        "PolicyDocument": {
+                            "Statement": [
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "xray:PutTraceSegments",
+                                        "xray:PutTelemetryRecords",
+                                        "xray:BatchGetTraces",
+                                        "xray:GetTraceSummaries"
+                                    ],
+                                    "Resource": "*"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "PolicyName": "KMS-Decrypt",
+                        "PolicyDocument": {
+                            "Statement": [
+                                {
+                                    "Sid": "Stmt1564146376746",
+                                    "Action": [
+                                        "kms:Decrypt"
+                                    ],
+                                    "Effect": "Allow",
+                                    "Resource": "*"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "PolicyName": "DynamoDB-Access",
+                        "PolicyDocument": {
+                            "Statement": [
+                                {
+                                    "Sid": "Stmt1564146560545",
+                                    "Action": [
+                                        "dynamodb:BatchGetItem",
+                                        "dynamodb:BatchWriteItem",
+                                        "dynamodb:GetItem",
+                                        "dynamodb:Query",
+                                        "dynamodb:Scan",
+                                        "dynamodb:UpdateItem",
+                                        "dynamodb:PutItem"
+                                    ],
+                                    "Effect": "Allow",
+                                    "Resource": {
+                                        "Fn::Join": [
+                                            "",
+                                            [
+                                                "arn:aws:dynamodb:",
+                                                {
+                                                    "Ref": "AWS::Region"
+                                                },
+                                                ":",
+                                                {
+                                                    "Ref": "AWS::AccountId"
+                                                },
+                                                ":table/input_data"
+                                            ]
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "PolicyName": "logs",
+                        "PolicyDocument": {
+                            "Statement": [
+                                {
+                                    "Sid": "Stmt1564148758856",
+                                    "Action": "logs:*",
+                                    "Effect": "Allow",
+                                    "Resource": "*"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "PolicyName": "S3-Access",
+                        "PolicyDocument": {
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Sid": "Stmt1564145987807",
+                                    "Action": [
+                                        "s3:GetObject",
+                                        "s3:GetObjectAcl"
+                                    ],
+                                    "Effect": "Allow",
+                                    "Resource": {
+                                        "Fn::Join": [
+                                            "",
+                                            [
+                                                "arn:aws:s3:::",
+                                                {
+                                                    "Ref": "artifactBucket"
+                                                }
+                                            ]
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "RoleName": "UppeCaseLambdaRole"
+            }
+        },
+        "upperCaseApi": {
+            "Type": "AWS::ApiGateway::RestApi",
+            "Properties": {
+                "Name": "UpperCase API",
+                "Description": "API used for converting  request input to upper case",
+                "FailOnWarnings": true
+            }
+        },
+        "lambdaPermission": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+                "Action": "lambda:invokeFunction",
+                "FunctionName": {
+                    "Fn::GetAtt": [
+                        "lambdaFunction",
+                        "Arn"
+                    ]
                 },
-                {
-                  "Sid": "Stmt1564146376746",
-                  "Action": [
-                    "kms:Decrypt"
-                  ],
-                  "Effect": "Allow",
-                  "Resource": "*"
-                },
-                {
-                  "Sid": "Stmt1564146560545",
-                  "Action": [
-                    "dynamodb:BatchGetItem",
-                    "dynamodb:BatchWriteItem",
-                    "dynamodb:GetItem",
-                    "dynamodb:Query",
-                    "dynamodb:Scan",
-                    "dynamodb:UpdateItem",
-                    "dynamodb:PutItem"
-                  ],
-                  "Effect": "Allow",
-                  "Resource": "arn:aws:dynamodb:eu-west-1:XXXXXX:table/input_data"
-                },
-                {
-                  "Sid": "Stmt1564148758856",
-                  "Action": "logs:*",
-                  "Effect": "Allow",
-                  "Resource": "*"
+                "Principal": "apigateway.amazonaws.com",
+                "SourceArn": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            "arn:aws:execute-api:",
+                            {
+                                "Ref": "AWS::Region"
+                            },
+                            ":",
+                            {
+                                "Ref": "AWS::AccountId"
+                            },
+                            ":",
+                            {
+                                "Ref": "upperCaseApi"
+                            },
+                            "/*"
+                        ]
+                    ]
                 }
-              ]
             }
-          }
-        ],
-        "RoleName": "UppeCaseLambdaRole"
-      }
+        },
+        "ApiStage": {
+            "DependsOn": [
+                "ApiGatewayAccount"
+            ],
+            "Type": "AWS::ApiGateway::Stage",
+            "Properties": {
+                "DeploymentId": {
+                    "Ref": "ApiDeployment"
+                },
+                "MethodSettings": [
+                    {
+                        "DataTraceEnabled": true,
+                        "HttpMethod": "*",
+                        "LoggingLevel": "INFO",
+                        "ResourcePath": "/*"
+                    }
+                ],
+                "RestApiId": {
+                    "Ref": "upperCaseApi"
+                },
+                "StageName": "LATEST"
+            }
+        },
+        "ApiGatewayCloudWatchLogsRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": [
+                                    "apigateway.amazonaws.com"
+                                ]
+                            },
+                            "Action": [
+                                "sts:AssumeRole"
+                            ]
+                        }
+                    ]
+                },
+                "Policies": [
+                    {
+                        "PolicyName": "ApiGatewayLogsPolicy",
+                        "PolicyDocument": {
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "logs:CreateLogGroup",
+                                        "logs:CreateLogStream",
+                                        "logs:DescribeLogGroups",
+                                        "logs:DescribeLogStreams",
+                                        "logs:PutLogEvents",
+                                        "logs:GetLogEvents",
+                                        "logs:FilterLogEvents"
+                                    ],
+                                    "Resource": "*"
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        "ApiGatewayAccount": {
+            "Type": "AWS::ApiGateway::Account",
+            "Properties": {
+                "CloudWatchRoleArn": {
+                    "Fn::GetAtt": [
+                        "ApiGatewayCloudWatchLogsRole",
+                        "Arn"
+                    ]
+                }
+            }
+        },
+        "ApiDeployment": {
+            "Type": "AWS::ApiGateway::Deployment",
+            "DependsOn": [
+                "upperCasePostRequest"
+            ],
+            "Properties": {
+                "RestApiId": {
+                    "Ref": "upperCaseApi"
+                }
+            }
+        },
+        "upperCaseResource": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+                "RestApiId": {
+                    "Ref": "upperCaseApi"
+                },
+                "ParentId": {
+                    "Fn::GetAtt": [
+                        "upperCaseApi",
+                        "RootResourceId"
+                    ]
+                },
+                "PathPart": "uppercase"
+            }
+        },
+        "upperCasePostRequest": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+                "AuthorizationType": "NONE",
+                "HttpMethod": "POST",
+                "Integration": {
+                    "IntegrationHttpMethod": "POST",
+                    "IntegrationResponses": [
+                        {
+                            "StatusCode": 200
+                        }
+                    ],
+                    "PassthroughBehavior": "WHEN_NO_MATCH",
+                    "Type": "AWS",
+                    "Uri": {
+                        "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaFunction.Arn}/invocations"
+                    }
+                },
+                "MethodResponses": [
+                    {
+                        "StatusCode": "200"
+                    },
+                    {
+                        "StatusCode": "400"
+                    }
+                ],
+                "ResourceId": {
+                    "Ref": "upperCaseResource"
+                },
+                "RestApiId": {
+                    "Ref": "upperCaseApi"
+                }
+            }
+        }
+    },
+    "Outputs": {
+        "URL": {
+            "Value": {
+                "Fn::Join": [
+                    "",
+                    [
+                        "https://",
+                        {
+                            "Ref": "upperCaseApi"
+                        },
+                        ".execute-api.",
+                        {
+                            "Ref": "AWS::Region"
+                        },
+                        ".amazonaws.com/",
+                        {
+                            "Ref": "ApiStage"
+                        },
+                        "/uppercase"
+                    ]
+                ]
+            }
+        }
     }
-  },
-  "Outputs": {
-    "Lambda": {
-      "Value": {
-        "Ref": "lambdaFunction"
-      }
-    }
-  }
 }
