@@ -5,3 +5,9 @@ This project is created for a POC on Spring Cloud Function and integrating with 
 ### Serverles Functions with DynamoDB
 
 Code changes incorporated for this available in commit https://github.com/vivekkannan05/SpringCloudFunction/commit/208bda4b5df2766fd6408ef025267d67effdd089
+
+### CloudFormation for Lambda and API Gateway
+
+Created a simple cloudformation template that would crete a Lambda and API Gateway
+
+commit : https://github.com/vivekkannan05/SpringCloudFunction/commit/ec729b90fddb7a72009e35c503567d9253522e64
