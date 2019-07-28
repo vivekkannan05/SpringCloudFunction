@@ -1,6 +1,6 @@
 {
     "AWSTemplateFormatVersion": "2010-09-09",
-    "Description": "",
+    "Description": "this cloud formation is created to expose a lambda via API Gateway",
     "Parameters": {
         "upperCaseArtifact": {
             "Type": "String",
