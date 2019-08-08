@@ -383,6 +383,25 @@
                     ]
                 ]
             }
+        },
+        "LambdaFunctionArn": {
+            "Value": {
+                "Fn::GetAtt": [
+                    "lambdaFunction",
+                    "Arn"
+                ]
+            },
+            "Export": {
+                "Name": "UpperCaseFunction-Arn"
+            }
+        },
+        "LambdaFunction": {
+            "Value": {
+                "Ref": "lambdaFunction"
+            },
+            "Export": {
+                "Name": "UpperCaseFunction"
+            }
         }
     }
 }

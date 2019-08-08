@@ -1,0 +1,44 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "Cloud Watch Event to overcome Lambda Cold Start",
+    "Metadata": {},
+    "Parameters": {},
+    "Mappings": {},
+    "Conditions": {},
+    "Resources": {
+        "ScheduledRule": {
+            "Type": "AWS::Events::Rule",
+            "Properties": {
+                "Description": "ScheduledRule",
+                "ScheduleExpression": "rate(10 minutes)",
+                "State": "ENABLED",
+                "Targets": [
+                    {
+                        "Arn": {
+                            "Fn::ImportValue": "UpperCaseFunction-Arn"
+                        },
+                        "Id": "TargetFunction1",
+                        "Input":"{\"input\":\"hello\"}"
+                    }
+                ]
+            }
+        },
+        "PermissionForEventsToInvokeLambda": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+                "FunctionName": {
+                    "Fn::ImportValue": "UpperCaseFunction"
+                },
+                "Action": "lambda:InvokeFunction",
+                "Principal": "events.amazonaws.com",
+                "SourceArn": {
+                    "Fn::GetAtt": [
+                        "ScheduledRule",
+                        "Arn"
+                    ]
+                }
+            }
+        }
+    },
+    "Outputs": {}
+}
