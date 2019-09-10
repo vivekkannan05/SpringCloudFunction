@@ -335,7 +335,10 @@
                     "IntegrationHttpMethod": "POST",
                     "IntegrationResponses": [
                         {
-                            "StatusCode": 200
+                            "StatusCode": 200,
+                            "ResponseTemplates": {
+                                "application/json": " #set($inputRoot = $input.path('$'))\n$input.json(\"$.body\")\n#if($inputRoot.statusCode.equalsIgnoreCase(\"BAD_REQUEST\"))\n#set($context.responseOverride.status = 400)\n#end\n#if($inputRoot.statusCode.equalsIgnoreCase(\"INTERNAL_SERVER_ERROR\"))\n#set($context.responseOverride.status = 500)\n#end"
+                              }
                         }
                     ],
                     "PassthroughBehavior": "WHEN_NO_MATCH",
@@ -347,9 +350,6 @@
                 "MethodResponses": [
                     {
                         "StatusCode": "200"
-                    },
-                    {
-                        "StatusCode": "400"
                     }
                 ],
                 "ResourceId": {
