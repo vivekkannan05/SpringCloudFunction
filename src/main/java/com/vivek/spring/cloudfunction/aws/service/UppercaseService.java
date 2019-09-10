@@ -18,9 +18,7 @@ public class UppercaseService {
     }
 
     public String uppercase(final String input) {
-        if (Strings.isBlank(input)) {
-            throw new NullPointerException("input is empty or null");
-        }
+
         dataRepo.save(new Data(input, input.toUpperCase()));
         return input.toUpperCase(Locale.ENGLISH);
     }
