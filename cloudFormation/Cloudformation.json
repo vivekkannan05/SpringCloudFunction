@@ -5,7 +5,7 @@
         "upperCaseArtifact": {
             "Type": "String",
             "Description": "Name of the key for Lambda Code in S3 bucket",
-            "Default": "spring-cloud-functions-0.0.2-SNAPSHOT-aws.jar"
+            "Default": "spring-cloud-functions-0.0.5-SNAPSHOT-aws.jar"
         },
         "artifactBucket": {
             "Type": "String",
@@ -41,7 +41,7 @@
                 "KmsKeyArn": "",
                 "Environment": {
                     "Variables": {
-                        "FUNCTION_NAME": "uppercaseFunction",
+                        "FUNCTION_NAME": "uppercase",
                         "MAIN_CLASS": "com.vivek.spring.cloudfunction.aws.CloudFunctionAwsApplication"
                     }
                 },
