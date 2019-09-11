@@ -8,6 +8,13 @@ Code changes incorporated for this available in commit https://github.com/vivekk
 
 ### CloudFormation for Lambda and API Gateway
 
-Created a simple cloudformation template that would crete a Lambda and API Gateway
+Created a simple cloudformation template that would create a Lambda and API Gateway
 
 commit : https://github.com/vivekkannan05/SpringCloudFunction/commit/ec729b90fddb7a72009e35c503567d9253522e64
+
+
+### Adding Exception Handling to API GATEWAY and LAMBDA
+
+Code changes to incorporate Exception Handling
+
+commit: https://github.com/vivekkannan05/SpringCloudFunction/commit/283860d47fbc7ae28f66e1366d98358e0e8d2cf1
